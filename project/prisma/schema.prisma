@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         Role     @default(CUSTOMER)
+  createdAt    DateTime @default(now()) @map("created_at")
+  orders       Order[]
+
+  @@map("users")
+}
+
+model Product {
+  id          String      @id @default(uuid())
+  title       String
+  description String?
+  priceFils   Int         @map("price_fils")
+  stock       Int         @default(0)
+  isActive    Boolean     @default(true) @map("is_active")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  items       OrderItem[]
+
+  @@map("products")
+}
+
+model Order {
+  id        String      @id @default(uuid())
+  user      User        @relation(fields: [userId], references: [id])
+  userId    String      @map("user_id")
+  status    OrderStatus @default(PENDING)
+  totalFils Int         @map("total_fils")
+  createdAt DateTime    @default(now()) @map("created_at")
+  items     OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id            String  @id @default(uuid())
+  order         Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId       String  @map("order_id")
+  product       Product @relation(fields: [productId], references: [id])
+  productId     String  @map("product_id")
+  qty           Int
+  unitPriceFils Int     @map("unit_price_fils")
+  lineTotalFils Int     @map("line_total_fils")
+
+  @@map("order_items")
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+  FULFILLED
+}
