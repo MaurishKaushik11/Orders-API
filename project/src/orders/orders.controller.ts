@@ -15,10 +15,10 @@ import { Role } from '@prisma/client';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
-import { PaginationDto } from '../common/dto/pagination.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
+import { OrdersQueryDto } from './dto/orders-query.dto';
 
 @ApiTags('Orders')
 @Controller('orders')
@@ -47,8 +47,8 @@ export class OrdersController {
   @Get()
   @ApiOperation({ summary: 'Get all orders (admin sees all, customers see their own)' })
   @ApiResponse({ status: 200, description: 'Orders retrieved successfully' })
-  findAll(@Query() paginationDto: PaginationDto, @Request() req) {
-    return this.ordersService.findAll(paginationDto, req.user);
+  findAll(@Query() query: OrdersQueryDto, @Request() req) {
+    return this.ordersService.findAll(query, req.user);
   }
 
   @Get(':id')

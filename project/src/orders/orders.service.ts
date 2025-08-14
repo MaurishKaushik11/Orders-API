@@ -157,11 +157,12 @@ export class OrdersService {
     return order;
   }
 
-  async findAll(paginationDto: PaginationDto, user: any) {
-    const { page = 1, limit = 20 } = paginationDto;
+  async findAll(query: { page?: number; limit?: number; status?: OrderStatus }, user: any) {
+    const { page = 1, limit = 20, status } = query;
     const skip = (page - 1) * limit;
 
-    const where = user.role === Role.ADMIN ? {} : { userId: user.id };
+    const whereBase = user.role === Role.ADMIN ? {} : { userId: user.id };
+    const where = status ? { ...whereBase, status } : whereBase;
 
     const [orders, total] = await Promise.all([
       this.prisma.order.findMany({
@@ -208,7 +209,8 @@ export class OrdersService {
   async findOne(id: string, user: any) {
     const where = user.role === Role.ADMIN ? { id } : { id, userId: user.id };
 
-    const order = await this.prisma.order.findUnique({
+    // findUnique only supports unique fields; use findFirst for combined filters
+    const order = await this.prisma.order.findFirst({
       where,
       include: {
         items: {

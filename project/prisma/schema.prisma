@@ -36,7 +36,7 @@ model Product {
 
 model Order {
   id        String      @id @default(uuid())
-  user      User        @relation(fields: [userId], references: [id])
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String      @map("user_id")
   status    OrderStatus @default(PENDING)
   totalFils Int         @map("total_fils")
@@ -50,7 +50,7 @@ model OrderItem {
   id            String  @id @default(uuid())
   order         Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId       String  @map("order_id")
-  product       Product @relation(fields: [productId], references: [id])
+  product       Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId     String  @map("product_id")
   qty           Int
   unitPriceFils Int     @map("unit_price_fils")

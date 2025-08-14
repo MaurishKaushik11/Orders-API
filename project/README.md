@@ -152,6 +152,8 @@ npm test
 ### Run e2e tests:
 ```bash
 npm run test:e2e
+# Serial mode (stable)
+npm run test:e2e:serial
 ```
 
 ### Run tests with coverage:
@@ -284,6 +286,16 @@ Ensure all secrets are properly configured:
 - Structured logging for observability  
 - Health check endpoints ready
 - Error tracking integration points
+
+## Submission Checklist
+
+Include the following in your submission (Git repo or ZIP of `project/`):
+
+- Project code: `src/`, `test/`, `prisma/`, `package.json`, `package-lock.json`, `nest-cli.json`, `tsconfig.json`, `Dockerfile`, `docker-compose.yml`, `.eslintrc.js`, `.prettierrc`, `.husky/`, `README.md`, `.env.example`
+- Exclude: `node_modules/`, `dist/`, `coverage/`
+- Prisma assets: `prisma/schema.prisma`, `prisma/migrations/**`, `prisma/seed.ts`
+- Tests: All e2e tests in `test/`
+- Optional: Postman collection and/or link to Swagger `http://localhost:3000/api-docs`
 
 ## License
 

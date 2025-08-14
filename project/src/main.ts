@@ -2,7 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import * as helmet from 'helmet';
+import helmet from 'helmet';
+import { AllExceptionsFilter } from './common/exceptions/http-exception.filter';
+import { RequestIdInterceptor } from './common/interceptors/request-id.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -14,6 +16,12 @@ async function bootstrap() {
   // Security
   app.use(helmet());
   app.enableCors();
+
+  // Global request ID + logging
+  app.useGlobalInterceptors(new RequestIdInterceptor());
+
+  // Consistent error format
+  app.useGlobalFilters(new AllExceptionsFilter());
 
   // Global validation pipe
   app.useGlobalPipes(

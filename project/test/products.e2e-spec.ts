@@ -12,6 +12,7 @@ describe('Products (e2e)', () => {
   let prisma: PrismaService;
   let adminToken: string;
   let customerToken: string;
+  let customerEmail: string;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -30,10 +31,18 @@ describe('Products (e2e)', () => {
     prisma = app.get<PrismaService>(PrismaService);
     await app.init();
 
-    // Create admin user
+    // Ensure clean state to avoid cross-test contamination
+    await prisma.orderItem.deleteMany();
+    await prisma.order.deleteMany();
+    await prisma.product.deleteMany();
+    await prisma.user.deleteMany();
+
+    // Create or update admin user (avoid unique conflicts across parallel suites)
     const hashedPassword = await bcrypt.hash('password123', 10);
-    await prisma.user.create({
-      data: {
+    await prisma.user.upsert({
+      where: { email: 'admin@example.com' },
+      update: { passwordHash: hashedPassword, role: Role.ADMIN },
+      create: {
         email: 'admin@example.com',
         passwordHash: hashedPassword,
         role: Role.ADMIN,
@@ -49,11 +58,15 @@ describe('Products (e2e)', () => {
       });
     adminToken = adminResponse.body.accessToken;
 
+    // Unique customer email per test to avoid collisions across suites
+    const unique = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    customerEmail = `customer+${unique}@example.com`;
+
     // Register customer
     const customerResponse = await request(app.getHttpServer())
       .post('/auth/register')
       .send({
-        email: 'customer@example.com',
+        email: customerEmail,
         password: 'password123',
       });
     customerToken = customerResponse.body.accessToken;

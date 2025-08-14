@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
-import { User } from '@prisma/client';
+import { Role } from '@prisma/client';
 
 interface TokenPayload {
   sub: string;
@@ -17,9 +17,17 @@ interface TokenPayload {
   role: string;
 }
 
-interface Tokens {
+export interface Tokens {
   accessToken: string;
   refreshToken: string;
+}
+
+// Minimal shape required to generate tokens
+interface MinimalUser {
+  id: string;
+  email: string;
+  role: Role;
+  createdAt: Date;
 }
 
 @Injectable()
@@ -76,7 +84,7 @@ export class AuthService {
     return this.generateTokens(user);
   }
 
-  private async generateTokens(user: User): Promise<Tokens> {
+  private async generateTokens(user: MinimalUser): Promise<Tokens> {
     const payload: TokenPayload = {
       sub: user.id,
       email: user.email,

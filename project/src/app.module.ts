@@ -12,12 +12,11 @@ import { OrdersModule } from './orders/orders.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    ThrottlerModule.forRoot([
-      {
-        ttl: parseInt(process.env.THROTTLE_TTL, 10) || 60,
-        limit: parseInt(process.env.THROTTLE_LIMIT, 10) || 10,
-      },
-    ]),
+    // Single options object for throttling
+    ThrottlerModule.forRoot({
+      ttl: parseInt(process.env.THROTTLE_TTL, 10) || 60,
+      limit: parseInt(process.env.THROTTLE_LIMIT, 10) || 10,
+    }),
     PrismaModule,
     AuthModule,
     UsersModule,
